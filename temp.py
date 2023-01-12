@@ -7,7 +7,7 @@ s2="ATTGATTGATTA"
 m1 = len(s1)+1
 n = len(s2)+1
 
-m = np.ones((m1,n)) * -100
+m = np.ones((m1,n)) * -50
 parent = np.zeros((m1,n,2))
 m[:,0] = 0
 m[0,:] = 0
@@ -30,56 +30,38 @@ for j in range(1,n):
             gap_seq2 = m[j][i-1] + gap_open + gap_extension
             gap_seq1 = m[j-1][i] + gap_open + gap_extension
             
-            l = np.array()
+            l = np.array([miss,gap_seq1,gap_seq2,0])
             
-
-# def allign(i,j):
-   
-#     global s1,s2,m,parent
-   
-#     if i>0 and j>0:
-#         if m[j][i-1] == -100:
-#             allign(i-1,j)
-#         if m[j-1][i-1] == -100:
-#             allign(i-1,j-1)
-#         if m[j-1][i] == -100:
-#             allign(i,j-1)
-       
-#         if s1[i-1] == s2[j-1]:
-#             if m[j-1][i-1] != -100:
-#                 m[j][i] = m[j-1][i-1]+match
-#                 parent[j][i] = [i-1,j-1]
-               
-#         else:
-#             l = np.array([m[j][i-1],m[j-1][i-1],m[j-1][i]])
-#             l = l + mismatch
-           
-#             if l[1] >= l[0] and l[1]>=l[2]:
-#                m[j][i] = l[1]
-#                parent[j][i] = [i-1,j-1]
-           
-#             elif l[0]>=l[0] and l[0]>=l[2]:
-#                 m[j][i] = l[0]
-#                 parent[j][i] = [i-1,j]
-           
-#             else:
-#                 m[j][i] = l[2]
-#                 parent[j][i] = [i,j-1]
-
-allign(len(s1),len(s2))
+            index = np.where(l==l.max())[0][0]
+            
+            m[j][i] = l.max()
+            
+            if index==0:
+                parent[j][i] = [i-1,j-1]
+            elif index==1:
+                parent[j][i] = [i-1,j]
+            elif index==2:
+                parent[j][i] = [i,j-1]
+            elif index==3:
+                parent[j][i] = [0,0]
+            
+            
 
 print(m)
 pi,pj = len(s1),len(s2)
 
 traceback=[]
 
+pis = np.where(m[-1]==m[-1].max())[0]
 
-while pi!=0 and pj!=0:
-    print(pi,pj)
-    traceback+=[[pi,pj]]
-    pi,pj = int(parent[pj][pi][0]),int(parent[pj][pi][1])
+for pi in pis:
+
+    while pi!=0 and pj!=0:
+        print(pi,pj)
+        traceback+=[[pi,pj]]
+        pi,pj = int(parent[pj][pi][0]),int(parent[pj][pi][1])
    
-traceback+=[[0,0]]
+# traceback+=[[0,0]]
    
 s_1 , s_2 = '',''
 for i in range(len(traceback)-1):
